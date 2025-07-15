@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Full Map - AlertFlow</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+</head>
+ <body class="bg-white text-gray-900 min-h-screen flex flex-col">
+  <!-- Header -->
+  <header class="bg-[#0a2048] text-white sticky top-0 z-50 shadow">
+    <nav class="max-w-7xl mx-auto flex items-center justify-between px-4 md:px-8 h-16">
+      <div class="flex items-center h-full">
+        <img src="logo.png" alt="AlertFlow Logo" class="h-10 w-auto mr-3" />
+        <span class="font-bold text-xl tracking-wide">AlertFlow</span>
+      </div>
+      <div class="hidden md:flex gap-8 items-center">
+        <a href="index.html" aria-label="Home" class="hover:text-blue-200 transition">HOME</a>
+        <a href="map.html" aria-label="Map" class="hover:text-blue-200 transition font-bold underline">MAP</a>
+        <a href="index.html#about" aria-label="About Us" class="hover:text-blue-200 transition">ABOUT US</a>
+        <a href="index.html#history" aria-label="History" class="hover:text-blue-200 transition">HISTORY</a>
+        <a href="index.html#contact" aria-label="Contact Us" class="hover:text-blue-200 transition">CONTACT US</a>
+      </div>
+      <div class="md:hidden flex items-center">
+        <button id="nav-toggle" aria-label="Open navigation menu" class="focus:outline-none focus:ring-2 focus:ring-white">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+      </div>
+    </nav>
+
+    </div>
+    <div id="mobile-nav" class="md:hidden bg-[#0a2048] w-full px-4 pb-4 hidden">
+      <a href="index.html" aria-label="Home" class="block py-2 px-2 rounded hover:bg-blue-900">HOME</a>
+      <a href="map.html" aria-label="Map" class="block py-2 px-2 rounded hover:bg-blue-900 font-bold underline">MAP</a>
+      <a href="index.html#about" aria-label="About Us" class="block py-2 px-2 rounded hover:bg-blue-900">ABOUT US</a>
+      <a href="index.html#history" aria-label="History" class="block py-2 px-2 rounded hover:bg-blue-900">HISTORY</a>
+      <a href="index.html#contact" aria-label="Contact Us" class="block py-2 px-2 rounded hover:bg-blue-900">CONTACT US</a>
+    </div>
+
+    <div class="max-w-7xl mx-auto mt-1">
+      <nav class="text-sm text-blue-100" aria-label="Breadcrumb">
+        <ol class="list-reset flex gap-2">
+          <li><a href="index.html" class="hover:underline">Home</a></li>
+          <li>/</li>
+          <li class="font-bold text-white">Map</li>
+        </ol>
+      </nav>
+  </header>
+  <main class="flex-1 flex flex-col items-center justify-center p-4 mt-16">
+    <div class="w-full max-w-5xl h-[80vh] rounded-lg shadow-lg overflow-hidden relative mb-8">
+      <div id="full-leaflet-map" class="w-full h-full" aria-label="Full Map"></div>
+      <div id="map-loading" class="absolute inset-0 flex items-center justify-center bg-white/80 z-20 text-[#0a2048] text-lg font-bold" style="display:none;">Loading map...</div>
+    </div>
+    <section id="waterlevel-analytics" class="w-full max-w-5xl bg-white rounded-lg shadow p-4">
+      <h2 class="text-lg font-bold mb-4 text-[#0a2048]">Barangay Water Level Analytics</h2>
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-left border border-gray-200 rounded-lg">
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="py-2 px-4">Barangay</th>
+              <th class="py-2 px-4">Water Level (m)</th>
+              <th class="py-2 px-4">Status</th>
+            </tr>
+          </thead>
+          <tbody id="waterlevel-table-body">
+            <!-- Rows will be inserted by JS -->
+          </tbody>
+        </table>
+      </div>
+      <div class="flex justify-center gap-4 mt-4">
+        <button id="prev-barangay" class="bg-[#0a2048] text-white px-4 py-2 rounded disabled:opacity-50" disabled>Previous</button>
+        <button id="next-barangay" class="bg-[#0a2048] text-white px-4 py-2 rounded">Next</button>
+      </div>
+    </section>
+  </main>
+  <!-- Footer -->
+  <footer class="bg-[#0a2048] text-white text-center py-4 mt-8">
+    <div class="text-sm">&copy; 2024 AlertFlow. All rights reserved. | Contact: info@alertflow.com | <a href="#" class="underline hover:text-blue-200" aria-label="Help">Help</a></div>
+  </footer>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var map = L.map('full-leaflet-map').setView([8.7422, 124.7772], 13);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
+      L.tileLayer('https://tiles.openrivercam.eu/rivercam/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://openrivercam.eu/">OpenRiverCam</a>',
+        opacity: 0.7
+      }).addTo(map);
+      // Main marker
+      L.marker([8.7422, 124.7772]).addTo(map).bindPopup('Balingasag Center');
+      // Dams/Spillways
+      L.marker([8.7500, 124.7800]).addTo(map).bindPopup('Balingasag Dam');
+      L.marker([8.7400, 124.7700]).addTo(map).bindPopup('Spillway A');
+      L.marker([8.7350, 124.7850]).addTo(map).bindPopup('Spillway B');
+      // Evacuation Centers
+      L.marker([8.7440, 124.7790]).addTo(map).bindPopup('Balingasag Municipal Gym (Evacuation Center)');
+      L.marker([8.7460, 124.7750]).addTo(map).bindPopup('Balingasag Central School (Evacuation Center)');
+      L.marker([8.7480, 124.7820]).addTo(map).bindPopup('Barangay Water Evac Center');
+
+      // Water level locations and real-time data
+      const locations = [
+        { name: 'Waterfall Bridge', coords: [8.735693, 124.784610] },
+        { name: 'Musi Musi Bridge', coords: [8.724486718212471, 124.7900193253209] },
+        { name: 'Dam River Spring Basin 1', coords: [8.732409683641604, 124.81591850898633] },
+        { name: 'Dam River Spring Basin 2', coords: [8.727959422445254, 124.82925542878345] },
+        { name: 'Dam River Spring Basin 3', coords: [8.724881880338508, 124.8476689826291] },
+        { name: 'Osmenia St.', coords: [8.732655, 124.781168] },
+        { name: 'Napaliran Riverside Swimming Basin 1', coords: [8.7717863858972, 124.78475574703454] },
+        { name: 'Talusan', coords: [8.735213, 124.795441] },
+        { name: 'Talusan', coords: [8.728564, 124.794482] },
+        { name: 'Dumarait', coords: [8.741671, 124.807469] },
+        { name: 'San Isidro', coords: [8.750209, 124.796196] },
+        { name: 'Binitinan Bridge', coords: [8.711928, 124.772201] },
+        { name: 'Linabu', coords: [8.7000, 124.8500] },
+        { name: 'Linggangao', coords: [8.6950, 124.8550] },
+        { name: 'Mambayaan', coords: [8.6900, 124.8600] },
+        { name: 'Mandangoa', coords: [8.6850, 124.8650] },
+        { name: 'Napaliran', coords: [8.6800, 124.8700] },
+        { name: 'Barangay 1 (Poblacion)', coords: [8.7425, 124.7775] },
+        { name: 'Barangay 2 (Poblacion)', coords: [8.7430, 124.7780] },
+        { name: 'Barangay 3 (Poblacion)', coords: [8.7435, 124.7785] },
+        { name: 'Barangay 4 (Poblacion)', coords: [8.7440, 124.7790] },
+        { name: 'Barangay 5 (Poblacion)', coords: [8.7445, 124.7795] },
+        { name: 'Barangay 6 (Poblacion)', coords: [8.7450, 124.7800] },
+        { name: 'Quezon', coords: [8.7500, 124.7850] },
+        { name: 'Rosario', coords: [8.7550, 124.7900] },
+        { name: 'Samay', coords: [8.7600, 124.7950] },
+        { name: 'San Isidro', coords: [8.7650, 124.8000] },
+        { name: 'San Juan', coords: [8.7700, 124.8050] },
+        { name: 'Talusan', coords: [8.7750, 124.8100] },
+        { name: 'Waterfall', coords: [8.7800, 124.8150] }
+      ];
+      function getLevelValue() {
+        // Simulate water level in meters (0.5 to 6.0)
+        return (Math.random() * 5.5 + 0.5).toFixed(2);
+      }
+      function getLevelStatus(value) {
+        value = parseFloat(value);
+        if (value < 2) return { status: 'Normal', color: 'green' };
+        if (value < 4) return { status: 'Warning', color: 'orange' };
+        return { status: 'Critical', color: 'red' };
+      }
+      // Pagination state
+      let page = 0;
+      const pageSize = 5;
+      let barangayMarkers = [];
+      // Store marker and data for each location
+      const waterLevelData = locations.map(loc => {
+        const value = getLevelValue();
+        const statusObj = getLevelStatus(value);
+        const marker = L.marker(loc.coords);
+        marker.bindPopup(
+          `<b>${loc.name}</b><br><span style='color:${statusObj.color};font-weight:bold;'>Water Level: ${value} m (${statusObj.status})</span>`
+        );
+        return { name: loc.name, value, status: statusObj.status, color: statusObj.color, marker };
+      });
+      // Render analytics table and map markers for current page
+      function renderPage() {
+        // Remove previous markers
+        barangayMarkers.forEach(m => map.removeLayer(m));
+        barangayMarkers = [];
+        // Table
+        const tbody = document.getElementById('waterlevel-table-body');
+        tbody.innerHTML = '';
+        const start = page * pageSize;
+        const end = Math.min(start + pageSize, waterLevelData.length);
+        for (let i = start; i < end; i++) {
+          const row = waterLevelData[i];
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td class="py-2 px-4">${row.name}</td><td class="py-2 px-4">${row.value}</td><td class="py-2 px-4 font-bold" style="color:${row.color}">${row.status}</td>`;
+          tbody.appendChild(tr);
+          row.marker.addTo(map);
+          barangayMarkers.push(row.marker);
+        }
+        // Pagination buttons
+        document.getElementById('prev-barangay').disabled = page === 0;
+        document.getElementById('next-barangay').disabled = end >= waterLevelData.length;
+      }
+      renderPage();
+      // Pagination events
+      document.getElementById('prev-barangay').addEventListener('click', function() {
+        if (page > 0) {
+          page--;
+        } else {
+          page = Math.floor((waterLevelData.length - 1) / pageSize); // last page
+        }
+        renderPage();
+      });
+      document.getElementById('next-barangay').addEventListener('click', function() {
+        if ((page + 1) * pageSize < waterLevelData.length) {
+          page++;
+        } else {
+          page = 0;
+        }
+        renderPage();
+      });
+      // Real-time update every 5 seconds
+      setInterval(() => {
+        waterLevelData.forEach(row => {
+          row.value = getLevelValue();
+          const statusObj = getLevelStatus(row.value);
+          row.status = statusObj.status;
+          row.color = statusObj.color;
+          row.marker.setPopupContent(
+            `<b>${row.name}</b><br><span style='color:${row.color};font-weight:bold;'>Water Level: ${row.value} m (${row.status})</span>`
+          );
+        });
+        renderPage();
+      }, 5000);
+    });
+  </script>
+</body>
+</html> 

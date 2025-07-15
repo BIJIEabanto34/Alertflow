@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 Not Found - AlertFlow</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-white text-gray-900 min-h-screen flex flex-col">
+  <header class="bg-[#0a2048] text-white sticky top-0 z-50 shadow">
+    <nav class="max-w-7xl mx-auto flex items-center justify-between px-4 md:px-8 h-16">
+      <div class="flex items-center h-full">
+        <img src="logo.png" alt="AlertFlow Logo" class="h-10 w-auto mr-3" />
+        <span class="font-bold text-xl tracking-wide">AlertFlow</span>
+      </div>
+      <div class="hidden md:flex gap-8 items-center">
+        <a href="index.html" aria-label="Home" class="hover:text-blue-200 transition">HOME</a>
+        <a href="map.html" aria-label="Map" class="hover:text-blue-200 transition">MAP</a>
+        <a href="index.html#about" aria-label="About Us" class="hover:text-blue-200 transition">ABOUT US</a>
+        <a href="index.html#history" aria-label="History" class="hover:text-blue-200 transition">HISTORY</a>
+        <a href="index.html#contact" aria-label="Contact Us" class="hover:text-blue-200 transition">CONTACT US</a>
+      </div>
+      <div class="md:hidden flex items-center">
+        <button id="nav-toggle" aria-label="Open navigation menu" class="focus:outline-none focus:ring-2 focus:ring-white">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+      </div>
+    </nav>
+    <div class="max-w-7xl mx-auto mt-1">
+      <nav class="text-sm text-blue-100" aria-label="Breadcrumb">
+        <ol class="list-reset flex gap-2">
+          <li><a href="index.html" class="hover:underline">Home</a></li>
+          <li>/</li>
+          <li class="font-bold text-white">404</li>
+        </ol>
+      </nav>
+    </div>
+    <div id="mobile-nav" class="md:hidden bg-[#0a2048] w-full px-4 pb-4 hidden">
+      <a href="index.html" aria-label="Home" class="block py-2 px-2 rounded hover:bg-blue-900">HOME</a>
+      <a href="map.html" aria-label="Map" class="block py-2 px-2 rounded hover:bg-blue-900">MAP</a>
+      <a href="index.html#about" aria-label="About Us" class="block py-2 px-2 rounded hover:bg-blue-900">ABOUT US</a>
+      <a href="index.html#history" aria-label="History" class="block py-2 px-2 rounded hover:bg-blue-900">HISTORY</a>
+      <a href="index.html#contact" aria-label="Contact Us" class="block py-2 px-2 rounded hover:bg-blue-900">CONTACT US</a>
+    </div>
+  </header>
+  <main class="flex-1 flex flex-col items-center justify-center p-8">
+    <div class="w-full max-w-lg bg-white rounded-lg shadow p-8 text-center mt-8">
+      <h1 class="text-4xl font-bold text-[#0a2048] mb-4">404</h1>
+      <p class="text-lg mb-6">Sorry, the page you are looking for could not be found.</p>
+      <a href="index.html" class="inline-block bg-[#0a2048] text-white px-6 py-2 rounded hover:bg-blue-900 transition mb-2" aria-label="Back to Home">Back to Home</a>
+      <div class="mt-2">
+        <a href="#" class="underline text-blue-700 hover:text-blue-900" aria-label="Help">Need Help?</a>
+      </div>
+    </div>
+  </main>
+  <footer class="bg-[#0a2048] text-white text-center py-4 mt-8">
+    <div class="text-sm">&copy; 2024 AlertFlow. All rights reserved. | Contact: info@alertflow.com | <a href="#" class="underline hover:text-blue-200" aria-label="Help">Help</a></div>
+  </footer>
+</body>
+</html> 
